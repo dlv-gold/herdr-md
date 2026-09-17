@@ -1,0 +1,3 @@
+include herdr-plugin.toml requirements.lock requirements-dev.lock LICENSE
+include scripts/bootstrap.py scripts/launch.py
+recursive-include examples *.md *.png

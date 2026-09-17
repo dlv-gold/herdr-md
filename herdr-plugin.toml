@@ -1,0 +1,27 @@
+id = "herdr-md"
+name = "Markdown Preview"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "Click Markdown links to open live previews with equations and PNG figures"
+platforms = ["linux"]
+
+[[build]]
+command = ["python3", "scripts/bootstrap.py"]
+
+[[actions]]
+id = "open"
+title = "Open Markdown preview"
+contexts = ["global", "pane"]
+command = ["python3", "scripts/launch.py", "--action"]
+
+[[panes]]
+id = "viewer"
+title = "Markdown"
+placement = "split"
+command = ["python3", "-c", "import os, runpy; runpy.run_path(os.path.join(os.environ['HERDR_PLUGIN_ROOT'], 'scripts/launch.py'), run_name='__main__')"]
+
+[[link_handlers]]
+id = "markdown"
+title = "Preview Markdown"
+pattern = '(?i)^file://[^?#]*\.(md|markdown)([?#].*)?$'
+action = "open"

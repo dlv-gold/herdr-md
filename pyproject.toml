@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "herdr-md"
+version = "0.1.0"
+description = "Clickable live Markdown, math, and PNG previews for Herdr and Kitty"
+requires-python = ">=3.12"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+dependencies = ["textual>=8,<9", "markdown-it-py>=4,<5", "mdit-py-plugins>=0.4,<1", "pillow>=11", "watchfiles>=1,<2", "ziamath>=0.12,<1", "latex2mathml>=3", "resvg-py>=0.2,<1"]
+
+[project.urls]
+Repository = "https://github.com/dlv-gold/herdr-md"
+Issues = "https://github.com/dlv-gold/herdr-md/issues"
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio", "ruff", "build"]
+
+[project.scripts]
+herdr-md = "herdr_md.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+ignore = ["E501"]

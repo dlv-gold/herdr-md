@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+build/
+dist/
+
+# Local development records and separate Herdr host modifications
+AGENTS.md
+notes/
+patches/
+scripts/check_plain_path_click.py

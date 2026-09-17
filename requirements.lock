@@ -1,0 +1,19 @@
+# Runtime and build dependencies, resolved on Python 3.14 / Linux.
+anyio==4.15.1
+idna==3.19
+latex2mathml==3.81.1
+linkify-it-py==2.2.0
+markdown-it-py==4.2.0
+mdit-py-plugins==0.6.1
+mdurl==0.1.2
+pillow==12.3.0
+platformdirs==4.11.9
+Pygments==2.21.0
+resvg_py==0.5.0
+rich==15.0.0
+setuptools==84.0.0
+textual==8.2.8
+typing_extensions==4.16.0
+watchfiles==1.2.0
+ziafont==0.11
+ziamath==0.13
