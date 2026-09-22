@@ -1,5 +1,6 @@
 import asyncio
 
+import pytest
 from PIL import Image
 from textual.geometry import Offset
 from textual.selection import Selection
@@ -40,13 +41,13 @@ async def test_initial_picker():
         assert isinstance(app.screen, FilePicker)
 
 
-async def test_selection_uses_terminal_cell_coordinates(tmp_path):
+async def test_selection_uses_textual_character_offsets(tmp_path):
     path = tmp_path / "unicode.md"
     path.write_text("界界abcdef")
     app = Viewer(path, watch=False, graphics="text")
     async with app.run_test():
         await eventually(lambda: bool(app.view.document.lines))
-        text, _ = app.view.get_selection(Selection(Offset(4, 0), Offset(7, 0)))
+        text, _ = app.view.get_selection(Selection(Offset(2, 0), Offset(5, 0)))
         assert text == "abc"
 
 
@@ -103,3 +104,45 @@ async def test_stale_document_cannot_replace_new_file(tmp_path):
         await app.reload_document(old_generation, a)
         await eventually(lambda: any("New" in line.plain for line in app.view.document.lines))
         assert not any("Old" in line.plain for line in app.view.document.lines)
+
+
+@pytest.mark.parametrize(
+    ("source", "start", "end", "expected"),
+    [
+        ("alpha beta gamma", (6, 0), (9, 0), "beta"),
+        ("alpha beta gamma", (9, 0), (6, 0), "beta"),
+        ("界界abcdef", (4, 0), (6, 0), "abc"),
+        ("first line\n\nsecond line", (6, 0), (5, 2), "line\n\nsecond"),
+    ],
+)
+async def test_mouse_drag_selects_only_dragged_text(tmp_path, source, start, end, expected):
+    path = tmp_path / "selection.md"
+    path.write_text(source)
+    app = Viewer(path, watch=False, graphics="text")
+    async with app.run_test() as pilot:
+        await eventually(lambda: bool(app.view.document.lines))
+        await pilot.pause()
+        await pilot.mouse_down("#document", offset=start)
+        await pilot.hover("#document", offset=end)
+        await pilot.mouse_up("#document", offset=end)
+        await pilot.pause()
+        assert app.screen.get_selected_text() == expected
+        assert app.view.selected.start is not None
+        assert app.view.selected.end is not None
+        # Selection must not paint unrelated text at the start of the document.
+        assert next(iter(app.view.render_line(0))).style.bgcolor.triplet != (69, 71, 90)
+
+
+async def test_mouse_selection_after_scrolling(tmp_path):
+    path = tmp_path / "scroll.md"
+    path.write_text("\n\n".join(f"row {i:02d} content" for i in range(50)))
+    app = Viewer(path, watch=False, graphics="text")
+    async with app.run_test(size=(80, 20)) as pilot:
+        await eventually(lambda: len(app.view.document.lines) > 50)
+        await pilot.pause()
+        app.view.scroll_to(y=20, animate=False, immediate=True)
+        await pilot.pause()
+        await pilot.mouse_down("#document", offset=(0, 0))
+        await pilot.hover("#document", offset=(5, 0))
+        await pilot.mouse_up("#document", offset=(5, 0))
+        assert app.screen.get_selected_text() == "row 10"

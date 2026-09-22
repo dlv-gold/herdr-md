@@ -125,6 +125,7 @@ class DocumentView(ScrollView):
             )
             .extend_cell_length(width, self.rich_style)
             .crop(0, width)
+            .apply_offsets(0, row)
         )
 
     def get_selection(self, selection):
@@ -132,8 +133,8 @@ class DocumentView(ScrollView):
         for row, line in enumerate(self.document.lines):
             if (span := selection.get_span(row)) is not None:
                 start, end = span
-                strip = Strip(list(line.render(self.app.console)))
-                lines.append(strip.crop(start, line.cell_len if end < 0 else end).text)
+                # Textual selection offsets index characters, not terminal cells.
+                lines.append(line.plain[start : None if end < 0 else end])
         return "\n".join(lines), "\n"
 
     def selection_updated(self, selection):
