@@ -146,3 +146,41 @@ async def test_mouse_selection_after_scrolling(tmp_path):
         await pilot.hover("#document", offset=(5, 0))
         await pilot.mouse_up("#document", offset=(5, 0))
         assert app.screen.get_selected_text() == "row 10"
+
+
+async def test_png_link_opens_new_herdr_preview(tmp_path, monkeypatch):
+    path = tmp_path / "report.md"
+    image = tmp_path / "figure #1.png"
+    Image.new("RGB", (16, 12), "red").save(image)
+    path.write_text("[Figure](figure%20%231.png)")
+    opened = []
+    monkeypatch.setenv("HERDR_ENV", "1")
+    monkeypatch.setattr("herdr_md.ui.open_pane", lambda target: opened.append(target))
+    app = Viewer(path, watch=False, graphics="text")
+    async with app.run_test() as pilot:
+        await eventually(lambda: bool(app.view.document.lines))
+        await pilot.pause()
+        await pilot.click("#document", offset=(2, 0))
+        assert opened == [image]
+
+
+async def test_png_opens_as_image_and_refreshes(tmp_path):
+    from herdr_md.graphics import Graphics
+
+    path = tmp_path / "figure #1.png"
+    Image.new("RGB", (16, 12), "red").save(path)
+    backend = Graphics("text")
+    backend.mode = "kitty"
+    backend.measure = lambda: backend.cell
+    backend.present = lambda *args: None
+    app = Viewer(path, backend=backend)
+    async with app.run_test() as pilot:
+        await eventually(lambda: bool(app.view.document.pictures))
+        assert not app.view.document.errors
+        assert app.view.document.pictures[0].image.getpixel((0, 0))[:3] == (255, 0, 0)
+        await eventually(lambda: path in app.dependencies)
+        await pilot.pause(0.3)
+        Image.new("RGB", (16, 12), "blue").save(path)
+        await eventually(
+            lambda: app.view.document.pictures[0].image.getpixel((0, 0))[:3] == (0, 0, 255)
+        )

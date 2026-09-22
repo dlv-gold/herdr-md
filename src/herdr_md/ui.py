@@ -5,7 +5,7 @@ import difflib
 import os
 import time
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import quote, unquote, urlsplit
 
 from rich.segment import Segment
 from textual import events
@@ -28,7 +28,7 @@ class MarkdownTree(DirectoryTree):
             p
             for p in paths
             if not p.name.startswith(".")
-            and (p.is_dir() or p.suffix.lower() in {".md", ".markdown"})
+            and (p.is_dir() or p.suffix.lower() in {".md", ".markdown", ".png"})
         ]
 
 
@@ -46,11 +46,11 @@ class FilePicker(ModalScreen[Path | None]):
 
     def compose(self):
         yield Input(
-            value=str(self.directory) + "/", placeholder="Markdown file path", id="filename"
+            value=str(self.directory) + "/", placeholder="Markdown or PNG file path", id="filename"
         )
         yield MarkdownTree(self.directory)
         yield Static(
-            "Choose a Markdown file, or enter its path. Escape cancels.", id="picker-status"
+            "Choose a Markdown or PNG file, or enter its path. Escape cancels.", id="picker-status"
         )
 
     def choose(self, value):
@@ -219,7 +219,11 @@ class Viewer(App):
             async with self.load_lock:
                 if generation != self.generation:
                     return
-                source = await asyncio.to_thread(path.read_text, encoding="utf-8")
+                if path.suffix.lower() == ".png":
+                    # Reuse image loading, scaling and watching without decoding PNG as text.
+                    source = f"![]({quote(path.name, safe='')})"
+                else:
+                    source = await asyncio.to_thread(path.read_text, encoding="utf-8")
                 document = await asyncio.to_thread(
                     build, source, path, width, self.backend.cell, self.backend.mode != "text"
                 )

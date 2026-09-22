@@ -16,16 +16,16 @@ def local_file(url: str) -> Path:
         socket.gethostname(),
         socket.getfqdn(),
     }:
-        raise ValueError("Expected a local file:// Markdown link")
+        raise ValueError("Expected a local file:// Markdown or PNG link")
     return checked_file(Path(unquote(parsed.path)))
 
 
 def checked_file(path: Path) -> Path:
     path = path.expanduser().resolve()
-    if path.suffix.lower() not in {".md", ".markdown"}:
-        raise ValueError("Select a .md or .markdown file")
+    if path.suffix.lower() not in {".md", ".markdown", ".png"}:
+        raise ValueError("Select a .md, .markdown or .png file")
     if not path.is_file():
-        raise ValueError(f"Markdown file not found: {path}")
+        raise ValueError(f"Preview file not found: {path}")
     with path.open("rb") as source:
         source.read(1)
     return path

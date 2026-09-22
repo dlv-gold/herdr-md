@@ -23,5 +23,5 @@ command = ["python3", "-c", "import os, runpy; runpy.run_path(os.path.join(os.en
 [[link_handlers]]
 id = "markdown"
 title = "Preview Markdown"
-pattern = '(?i)^file://[^?#]*\.(md|markdown)([?#].*)?$'
+pattern = '(?i)^file://[^?#]*\.(md|markdown|png)([?#].*)?$'
 action = "open"

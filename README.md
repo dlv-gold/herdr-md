@@ -11,7 +11,7 @@ The viewer keeps prose as selectable terminal text and renders equations and fig
 - Display local PNG figures referenced by the document.
 - Refresh when the Markdown file or its referenced figures change.
 - Scroll, search text, and choose files from the viewer.
-- Follow links to other Markdown documents in new Herdr panes.
+- Follow links to Markdown documents or local PNG figures in new Herdr panes.
 
 ## Install with Herdr
 
@@ -40,7 +40,7 @@ Run this from a shell pane inside Herdr:
 herdr plugin action invoke herdr-md.open
 ```
 
-A new split opens with a file picker. Choose a Markdown file or enter its path. Edit the document in your usual editor; the preview refreshes after saves. Press `o` to choose another document in the same viewer, or `q` to close the viewer.
+A new split opens with a file picker. Choose a Markdown or PNG file, or enter its path. Edit the document in your usual editor; the preview refreshes after saves. Press `o` to choose another document in the same viewer, or `q` to close the viewer.
 
 Optional shortcut in Herdr's configuration:
 
@@ -88,9 +88,9 @@ Prose supports mouse selection. Rendered equations and figures are images, so th
 
 ## Markdown links
 
-Click a link to another local Markdown document **inside the preview** to open it in a new Herdr pane. When running outside Herdr, the same link loads the document in the current viewer.
+Click a link to another local Markdown document or PNG figure **inside the preview** to open it in a new Herdr pane. For example, `[Results](figures/results.png)` opens an image preview, while `![Results](figures/results.png)` embeds the image in the document. When running outside Herdr, the same link loads the document in the current viewer.
 
-The plugin also registers a handler for local Markdown `file://` terminal hyperlinks. When another terminal application emits one, **Ctrl-click** lets Herdr route it to a new preview pane. This requires the terminal to deliver the modified click to Herdr.
+The plugin also registers a handler for local Markdown and PNG `file://` terminal hyperlinks. When another terminal application emits one, **Ctrl-click** lets Herdr route it to a new preview pane. This requires the terminal to deliver the modified click to Herdr.
 
 The plugin does not make arbitrary plain file paths clickable. On stock Herdr 0.9.0, a printed `/path/to/report.md` needs terminal hyperlink metadata for this handler to run. Links in a separate graphical chat application are handled by that application.
 
@@ -120,6 +120,7 @@ Keep the checkout at this location and ensure `~/.local/bin` is on your PATH. Yo
 
 ```sh
 herdr-md /path/to/report.md          # view in the current terminal
+herdr-md /path/to/figure.png         # view a PNG directly
 herdr-md                            # open the file picker
 herdr-md --pane /path/to/report.md   # open a new split inside Herdr
 ```
