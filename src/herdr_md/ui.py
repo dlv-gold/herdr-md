@@ -293,6 +293,9 @@ class Viewer(App):
         key = (self.epoch, int(self.view.scroll_y), region)
         if key == self.last_frame or not self.view.document.lines:
             return
+        # Herdr keeps the last frame of a hidden pane; paint the current one once it is shown.
+        if not self.backend.visible:
+            return
         self.last_frame = key
         async with self.paint_lock:
             try:

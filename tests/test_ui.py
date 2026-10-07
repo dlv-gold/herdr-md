@@ -195,3 +195,23 @@ async def test_png_opens_as_image_and_refreshes(tmp_path):
         await eventually(
             lambda: app.view.document.pictures[0].image.getpixel((0, 0))[:3] == (0, 0, 255)
         )
+
+
+async def test_hidden_herdr_pane_paints_only_once_shown(tmp_path):
+    from herdr_md.graphics import Graphics
+
+    file = tmp_path / "test.md"
+    file.write_text("# Heading\n\nParagraph")
+    backend = Graphics("text")
+    backend.mode = "herdr"
+    backend.visible = False
+    backend.measure = lambda: backend.cell
+    presented = []
+    backend.present = lambda *args: presented.append(args)
+    app = Viewer(file, watch=False, backend=backend)
+    async with app.run_test():
+        await eventually(lambda: app.view.document.lines)
+        await asyncio.sleep(0.3)
+        assert not presented
+        backend.visible = True
+        await eventually(lambda: presented)

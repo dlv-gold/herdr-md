@@ -22,6 +22,7 @@ class Graphics:
     def __init__(self, mode="auto"):
         self.mode = "text"
         self.cell = (8, 16)
+        self.visible = True
         self.pane = os.environ.get("HERDR_PANE_ID")
         self.stream = None
         self.image_id = random.randint(1, 2**31)
@@ -66,6 +67,7 @@ class Graphics:
     def measure(self):
         if self.mode == "herdr":
             info = call("pane.graphics.info", {"pane_id": self.pane})
+            self.visible = info.get("pane_visible", True)
             if info["cell_width_px"] and info["cell_height_px"]:
                 self.cell = info["cell_width_px"], info["cell_height_px"]
         elif self.mode == "kitty":
