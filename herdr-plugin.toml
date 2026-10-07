@@ -1,6 +1,6 @@
 id = "herdr-md"
 name = "Markdown Preview"
-version = "0.1.0"
+version = "0.1.1"
 min_herdr_version = "0.9.0"
 description = "Click Markdown links to open live previews with equations and PNG figures"
 platforms = ["linux"]

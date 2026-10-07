@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "herdr-md"
-version = "0.1.0"
+version = "0.1.1"
 description = "Clickable live Markdown, math, and PNG previews for Herdr and Kitty"
 requires-python = ">=3.12"
 readme = "README.md"
