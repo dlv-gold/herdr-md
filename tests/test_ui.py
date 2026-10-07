@@ -34,6 +34,17 @@ async def test_open_search_resize_and_picker(tmp_path):
         assert not isinstance(app.screen, FilePicker)
 
 
+async def test_narrow_pane_does_not_reload_repeatedly(tmp_path):
+    file = tmp_path / "test.md"
+    file.write_text("# Heading\n\nParagraph")
+    app = Viewer(file, watch=False, graphics="text")
+    async with app.run_test(size=(7, 20)):
+        await eventually(lambda: app.view.document.lines)
+        epoch = app.epoch
+        await asyncio.sleep(0.5)
+        assert app.epoch == epoch
+
+
 async def test_initial_picker():
     app = Viewer(watch=False, graphics="text")
     async with app.run_test() as pilot:

@@ -285,8 +285,10 @@ class Viewer(App):
             except (OSError, ValueError):
                 pass
             changed_metrics = old_cell != self.backend.cell
-        if self.path and (region.width != self.last_width or changed_metrics):
-            self.last_width = region.width
+        # Match reload_document's minimum width, or panes narrower than it reload every tick.
+        width = max(8, region.width)
+        if self.path and (width != self.last_width or changed_metrics):
+            self.last_width = width
             self.request_reload()
         key = (self.epoch, int(self.view.scroll_y), region)
         if key == self.last_frame or not self.view.document.lines:
